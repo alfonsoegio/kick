@@ -7,7 +7,6 @@ pub fn render_stage(canvas: &mut Canvas<sdl2::video::Window>,
                     heart_texture: &Texture)
                     -> Result<(), String> {
     println!("Hola desde stage.rs");
-    canvas.clear();
     canvas.copy(background_texture, None, None)?;
     let heart_positions = [50, 80, 110, 140, 170];
     for heart_position in heart_positions {
@@ -17,6 +16,5 @@ pub fn render_stage(canvas: &mut Canvas<sdl2::video::Window>,
         canvas.copy_ex(heart_texture,
                        None, rect, 0.0, point, false, false)?;
     }
-    canvas.present();
     Ok(())
 }
