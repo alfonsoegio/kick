@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use sdl2::rect::Point;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -79,6 +81,64 @@ pub fn manage_cursor_keys(o: &mut Dummy, event: sdl2::event::Event) {
 pub fn change_position(o: &mut Dummy) {
     o.position.x += o.scale.x * o.speed.x;
     o.position.y += o.scale.y * o.speed.y;
+}
+
+pub fn random_movement(o: &mut Dummy) {
+    if o.speed.x != 0 || o.speed.y != 0 {
+        o.animation += 1;
+    }
+
+    let mut boundary: bool = false;
+
+    if o.position.x - o.scale.x * o.size.x / 2 <= 0 {
+        o.position.x += 1;
+        o.speed.x *= -1;
+        o.direction = DIRECTION_E;
+        boundary = true;
+    }
+    if o.position.x + o.scale.x * o.size.x / 2 >= SCREEN_WIDTH as i32 {
+        o.position.x += -1;
+        o.speed.x *= -1;
+        o.direction = DIRECTION_W;
+        boundary = true;
+    }
+    if o.position.y - o.scale.y * o.size.y / 2 <= 0 {
+        o.position.y += 1;
+        o.speed.y *= -1;
+        o.direction = DIRECTION_S;
+        boundary = true;
+    }
+    if o.position.y + o.scale.y * o.size.y / 2 >= SCREEN_HEIGHT as i32 {
+        o.position.y += -1;
+        o.speed.y *= -1;
+        o.direction = DIRECTION_N;
+        boundary = true;
+    }
+
+    if rand::thread_rng().gen_range(0..=100) > 98 && !boundary {
+        o.direction = rand::thread_rng().gen_range(0..o.n_direction);
+    }
+
+    if rand::thread_rng().gen_range(0..=10) > 8 {
+        o.animation += 1;
+        if o.direction == DIRECTION_N {
+            o.speed.x = 0;
+            o.speed.y = -1;
+        }
+        if o.direction == DIRECTION_S {
+            o.speed.x = 0;
+            o.speed.y = 1;
+        }
+        if o.direction == DIRECTION_W {
+            o.speed.x = -1;
+            o.speed.y = 0;
+        }
+        if o.direction == DIRECTION_E {
+            o.speed.x = 1;
+            o.speed.y = 0;
+        }
+        change_position(o);
+    }
 }
 
 pub fn arrow_movement(o: &mut Dummy) {
