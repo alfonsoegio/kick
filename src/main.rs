@@ -16,6 +16,7 @@ use rand::Rng;
 mod stage;
 mod dummy;
 mod collision;
+mod sound;
 
 use dummy::Dummy;
 

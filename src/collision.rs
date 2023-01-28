@@ -4,6 +4,7 @@ use arrayvec::ArrayVec;
 use sdl2::rect::Rect;
 
 use crate::dummy::Dummy;
+use crate::sound;
 
 pub fn collision(a: &Dummy, b: &Dummy) -> bool {
     let rect_a = Rect::from_center(a.position,
@@ -25,6 +26,7 @@ pub fn compute_collisions(hero: &Dummy, dealers: &mut ArrayVec<Dummy, N_DEALERS>
             continue;
         }
         if collision(hero, dealer) {
+            sound::play_hit();
             dealer.collided = true;
             dealer.speed.x = 2 * hero.speed.x;
             dealer.speed.y = 2 * hero.speed.y;
