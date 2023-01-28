@@ -141,6 +141,11 @@ pub fn random_movement(o: &mut Dummy) {
     }
 }
 
+pub fn uniform_movement(o: &mut Dummy) {
+    o.animation += 1;
+    change_position(o);
+}
+
 pub fn arrow_movement(o: &mut Dummy) {
     change_position(o);
     if o.speed.x != 0 || o.speed.y != 0 {

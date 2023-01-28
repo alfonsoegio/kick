@@ -13,3 +13,4 @@ features = ["image", "ttf"]
 [dependencies]
 arrayvec = "0.7.2"
 rand = "0.8.5"
+rodio = "0.16.0"
