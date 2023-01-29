@@ -29,7 +29,7 @@ const HERO_TEXTURE_PATH: &str = "./assets/images/dummies/link1.png";
 const DEALER_TEXTURE_PATH: &str = "./assets/images/dummies/wizard1.png";
 const DANGEROUS_DEALER_TEXTURE_PATH: &str = "./assets/images/dummies/red1.png";
 
-const MAIN_SPEED: u32 = 200;
+const MAIN_SPEED: u32 = 100;
 const N_DEALERS: usize = 20;
 
 fn init_dealers(dealers: &mut ArrayVec<Dummy, N_DEALERS>, size: Point, scale: Point) {

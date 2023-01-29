@@ -27,6 +27,9 @@ pub fn compute_collisions(hero: &Dummy, dealers: &mut ArrayVec<Dummy, N_DEALERS>
         }
         if collision(hero, dealer) {
             sound::play_hit();
+            if dealer.state != 0 {
+                sound::play_hurt();
+            }
             dealer.collided = true;
             dealer.speed.x = 2 * hero.speed.x;
             dealer.speed.y = 2 * hero.speed.y;
