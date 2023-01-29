@@ -1,10 +1,31 @@
-use crate::{N_DEALERS, dummy};
+use crate::{N_DEALERS, dummy, SCREEN_WIDTH, SCREEN_HEIGHT};
 use arrayvec::ArrayVec;
 
 use sdl2::rect::Rect;
 
 use crate::dummy::Dummy;
 use crate::sound;
+
+pub fn compute_dealers_out(dealers: &mut ArrayVec<Dummy, N_DEALERS>) {
+    for dealer in dealers {
+        if dealer.state < 2 && dealer.position.x > SCREEN_WIDTH as i32 {
+            dealer.state = 2;
+            sound::play_out();
+        }
+        if dealer.state < 2 && dealer.position.x < 0 {
+            dealer.state = 2;
+            sound::play_out();
+        }
+        if dealer.state < 2 && dealer.position.y > SCREEN_HEIGHT as i32 {
+            dealer.state = 2;
+            sound::play_out();
+        }
+        if dealer.state < 2 && dealer.position.y  < 0 {
+            dealer.state = 2;
+            sound::play_out();
+        }
+    }
+}
 
 pub fn collision(a: &Dummy, b: &Dummy) -> bool {
     let rect_a = Rect::from_center(a.position,
@@ -41,6 +62,7 @@ pub fn compute_collisions(hero: &mut Dummy, dealers: &mut ArrayVec<Dummy, N_DEAL
         }
     }
     compute_collisions_2(dealers);
+    compute_dealers_out(dealers);
 }
 
 pub fn compute_collisions_2(dealers: &mut ArrayVec<Dummy, N_DEALERS>) {
