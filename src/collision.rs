@@ -6,21 +6,25 @@ use sdl2::rect::Rect;
 use crate::dummy::Dummy;
 use crate::sound;
 
-pub fn compute_dealers_out(dealers: &mut ArrayVec<Dummy, N_DEALERS>) {
+pub fn compute_dealers_out(dealers: &mut ArrayVec<Dummy, N_DEALERS>, hero: &mut Dummy) {
     for dealer in dealers {
         if dealer.state < 2 && dealer.position.x > SCREEN_WIDTH as i32 {
+            hero.score += 1;
             dealer.state = 2;
             sound::play_out();
         }
         if dealer.state < 2 && dealer.position.x < 0 {
+            hero.score += 1;
             dealer.state = 2;
             sound::play_out();
         }
         if dealer.state < 2 && dealer.position.y > SCREEN_HEIGHT as i32 {
+            hero.score += 1;
             dealer.state = 2;
             sound::play_out();
         }
         if dealer.state < 2 && dealer.position.y  < 0 {
+            hero.score += 1;
             dealer.state = 2;
             sound::play_out();
         }
@@ -48,6 +52,7 @@ pub fn compute_collisions(hero: &mut Dummy, dealers: &mut ArrayVec<Dummy, N_DEAL
         }
         if collision(hero, dealer) {
             if dealer.state != 0 {
+                hero.lives -= 1;
                 sound::play_hurt();
                 hero.transition = 100;
                 sound::play_fire();
@@ -62,7 +67,7 @@ pub fn compute_collisions(hero: &mut Dummy, dealers: &mut ArrayVec<Dummy, N_DEAL
         }
     }
     compute_collisions_2(dealers);
-    compute_dealers_out(dealers);
+    compute_dealers_out(dealers, hero);
 }
 
 pub fn compute_collisions_2(dealers: &mut ArrayVec<Dummy, N_DEALERS>) {

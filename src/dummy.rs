@@ -29,7 +29,9 @@ pub struct Dummy {
     pub movement: fn(&mut Dummy),
     pub transition: i32,
     pub n_transition: i32,
-    pub texture_size: Point
+    pub texture_size: Point,
+    pub lives: i32,
+    pub score: i32
 }
 
 impl Default for Dummy {
@@ -48,7 +50,9 @@ impl Default for Dummy {
             collided: false,
             state: 0,
             movement: arrow_movement,
-            texture_size: Point::new(16, 32)
+            texture_size: Point::new(16, 32),
+            lives: 5,
+            score: 0
         }
     }
 }

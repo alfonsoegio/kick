@@ -29,9 +29,10 @@ const HERO_TEXTURE_PATH: &str = "./assets/images/dummies/link1.png";
 const DEALER_TEXTURE_PATH: &str = "./assets/images/dummies/wizard1.png";
 const DANGEROUS_DEALER_TEXTURE_PATH: &str = "./assets/images/dummies/red1.png";
 const FIRE_TEXTURE_PATH: &str = "./assets/images/transitions/fire.png";
+const FONT_PATH: &str = "./assets/font/FreeSerifBold.ttf";
 
 const MAIN_SPEED: u32 = 100;
-const N_DEALERS: usize = 20;
+const N_DEALERS: usize = 16;
 
 fn init_dealers(dealers: &mut ArrayVec<Dummy, N_DEALERS>, size: Point, scale: Point) {
     for _ in 0..N_DEALERS {
@@ -53,7 +54,9 @@ fn init_dealers(dealers: &mut ArrayVec<Dummy, N_DEALERS>, size: Point, scale: Po
                 movement: dummy::random_movement,
                 transition: 0,
                 n_transition: 3,
-                texture_size: Point::new(16, 32)
+                texture_size: Point::new(16, 32),
+                lives: 0,
+                score: 0
             });
     }
 }
@@ -113,7 +116,9 @@ fn main() -> Result<(), String> {
     canvas.clear();
     stage::render_stage(&mut canvas,
                         &background_texture,
-                        &heart_texture)?;
+                        &heart_texture,
+                        hero.lives,
+                        hero.score)?;
     dummy::render_dummy(hero, &mut canvas, &hero_texture, &hero_texture, &fire_texture)?;
     canvas.present();
 
@@ -125,16 +130,52 @@ fn main() -> Result<(), String> {
                 Event::Quit { .. }
                 | Event::KeyDown { keycode: Some(Keycode::Q), .. }
                 | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                    println!("Saliendo");
                     break 'running
                 },
                 _ => {
-                    dummy::manage_cursor_keys(hero, event);
+                    if hero.lives > 0 {
+                        dummy::manage_cursor_keys(hero, event);
+                    }
                 }
             }
         }
         collision::compute_collisions(hero, &mut dealers);
-        stage::render_stage(&mut canvas, &background_texture, &heart_texture)?;
+        stage::render_stage(&mut canvas, &background_texture, &heart_texture, hero.lives, hero.score)?;
+        dummy::render_dummy(hero, &mut canvas, &hero_texture, &hero_texture, &fire_texture)?;
+        (hero.movement)(hero);
+        move_dealers(&mut dealers);
+        render_dealers(&mut dealers,
+                       &mut canvas,
+                       &dealer_texture,
+                       &dangerous_dealer_texture,
+                       &fire_texture)?;
+        if hero.lives <= 0 {
+            break 'running
+        }
+        canvas.present();
+        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / MAIN_SPEED));
+    }
+    hero.speed.x = 0;
+    hero.speed.y = 0;
+    hero.movement = dummy::uniform_movement;
+    hero.transition = 1000000;
+    for dealer in &mut dealers {
+        dealer.transition = 1000000;
+    }
+    sound::play_requiem();
+    'hades: loop {
+        for event in event_pump.poll_iter() {
+            match event {
+                Event::Quit { .. }
+                | Event::KeyDown { keycode: Some(Keycode::Q), .. }
+                | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+                    break 'hades;
+                },
+                _ => {
+                }
+            }
+        }
+        stage::render_stage(&mut canvas, &background_texture, &heart_texture, hero.lives, hero.score)?;
         dummy::render_dummy(hero, &mut canvas, &hero_texture, &hero_texture, &fire_texture)?;
         (hero.movement)(hero);
         move_dealers(&mut dealers);
