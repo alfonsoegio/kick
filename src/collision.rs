@@ -17,7 +17,7 @@ pub fn collision(a: &Dummy, b: &Dummy) -> bool {
 
 }
 
-pub fn compute_collisions(hero: &Dummy, dealers: &mut ArrayVec<Dummy, N_DEALERS>) {
+pub fn compute_collisions(hero: &mut Dummy, dealers: &mut ArrayVec<Dummy, N_DEALERS>) {
     for dealer in &mut *dealers {
         if dealer.collided {
             continue;
@@ -26,9 +26,13 @@ pub fn compute_collisions(hero: &Dummy, dealers: &mut ArrayVec<Dummy, N_DEALERS>
             continue;
         }
         if collision(hero, dealer) {
-            sound::play_hit();
             if dealer.state != 0 {
                 sound::play_hurt();
+                hero.transition = 100;
+                sound::play_fire();
+                dealer.transition = 100;
+            } else {
+                sound::play_hit();
             }
             dealer.collided = true;
             dealer.speed.x = 2 * hero.speed.x;
@@ -49,6 +53,9 @@ pub fn compute_collisions_2(dealers: &mut ArrayVec<Dummy, N_DEALERS>) {
                 continue;
             }
             if collision(&dealers[i], &dealers[j]) {
+                sound::play_hit();
+                sound::play_fire();
+                dealers[i].transition = 100;
                 dealers[i].collided = false;
                 dealers[i].movement = dummy::random_movement;
                 dealers[i].state = 1;

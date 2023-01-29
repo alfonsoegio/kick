@@ -3,6 +3,9 @@ use rand::Rng;
 use sdl2::rect::Point;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
+use sdl2::render::Texture;
+use sdl2::render::Canvas;
+use sdl2::rect::Rect;
 
 use crate::SCREEN_WIDTH;
 use crate::SCREEN_HEIGHT;
@@ -23,7 +26,10 @@ pub struct Dummy {
     pub n_animation: i32,
     pub collided: bool,
     pub state: i32,
-    pub movement: fn(&mut Dummy)
+    pub movement: fn(&mut Dummy),
+    pub transition: i32,
+    pub n_transition: i32,
+    pub texture_size: Point
 }
 
 impl Default for Dummy {
@@ -37,11 +43,42 @@ impl Default for Dummy {
             direction: 0,
             animation: 0,
             n_animation: 9,
+            transition: 0,
+            n_transition: 3,
             collided: false,
             state: 0,
-            movement: arrow_movement
+            movement: arrow_movement,
+            texture_size: Point::new(16, 32)
         }
     }
+}
+
+pub fn render_dummy(o: &mut Dummy,
+                    canvas: &mut Canvas<sdl2::video::Window>,
+                    texture: &Texture,
+                    dangerous_texture: &Texture,
+                    fire_texture: &Texture) -> Result<(), String> {
+    let src_ox = o.direction * o.size.x;
+    let src_oy = (o.animation % o.n_animation) * o.size.y;
+    let src = Rect::new(src_ox, src_oy,
+                        o.size.x as u32, o.size.y as u32);
+    let dst = Rect::from_center(
+        o.position,
+        (o.scale.x as u32) * (o.size.x as u32),
+        (o.scale.y as u32) * (o.size.y as u32));
+    if o.state == 0 {
+        canvas.copy_ex(texture, src, dst, 0.0, None, false, false)?;
+    } else {
+        canvas.copy_ex(dangerous_texture, src, dst, 0.0, None, false, false)?;
+    }
+    if o.transition > 0 {
+        let fire_ox = 0;
+        let fire_oy = (o.transition % o.n_transition) * o.texture_size.y;
+        let fire_src = Rect::new(fire_ox, fire_oy, o.texture_size.x as u32, o.texture_size.y as u32);
+        canvas.copy_ex(fire_texture, fire_src, dst, 0.0, None, false, false)?;
+        o.transition -= 1;
+    }
+    Ok(())
 }
 
 pub fn manage_cursor_keys(o: &mut Dummy, event: sdl2::event::Event) {
